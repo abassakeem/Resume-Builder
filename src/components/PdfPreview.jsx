@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { pdf } from "@react-pdf/renderer";
-import { getDocument, GlobalWorkerOptions } from "pdfjs-dist/legacy/build/pdf.mjs";
-import workerUrl from "pdfjs-dist/legacy/build/pdf.worker.min.mjs?url";
+import { getDocument } from "../lib/pdfjs";
+import { embedResumeData } from "../lib/embeddedData";
 import ClassicTemplate from "../templates/ClassicTemplate";
 import ModernTemplate from "../templates/ModernTemplate";
 import MinimalTemplate from "../templates/MinimalTemplate";
@@ -12,8 +12,6 @@ const TEMPLATES = {
   2: ModernTemplate,
   3: MinimalTemplate,
 };
-
-GlobalWorkerOptions.workerSrc = workerUrl;
 
 const MAX_PAGE_WIDTH = 820;
 const RENDER_DELAY_MS = 300;
@@ -50,7 +48,9 @@ export function DownloadButton({ data }) {
   const handleDownload = async () => {
     setBuilding(true);
     try {
-      const url = URL.createObjectURL(await buildPdf(data));
+      // Embed the form data so uploading this PDF later restores every field exactly.
+      const bytes = embedResumeData(new Uint8Array(await (await buildPdf(data)).arrayBuffer()), data);
+      const url = URL.createObjectURL(new Blob([bytes], { type: "application/pdf" }));
       const a = document.createElement("a");
       a.href = url;
       a.download = filename;

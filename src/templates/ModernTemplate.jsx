@@ -184,7 +184,7 @@ export default function ModernTemplate({ data }) {
                   </View>
                   {job.highlights?.map((h, j) => (
                     <View key={j} style={styles.bullet}>
-                      <Text style={styles.bulletDot}>▸</Text>
+                      <Text style={styles.bulletDot}>›</Text>
                       <Text style={styles.bulletText}>{h}</Text>
                     </View>
                   ))}

@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { CheckCircle2, AlertCircle, X } from "lucide-react";
+import { CheckCircle2, AlertCircle, AlertTriangle, X } from "lucide-react";
 
 const VARIANTS = {
   success: { icon: CheckCircle2, iconClass: "text-emerald-400 bg-emerald-500/10", barClass: "bg-emerald-400", duration: 4000 },
+  warning: { icon: AlertTriangle, iconClass: "text-amber-400 bg-amber-500/10", barClass: "bg-amber-400", duration: 9000 },
   error: { icon: AlertCircle, iconClass: "text-red-400 bg-red-500/10", barClass: "bg-red-400", duration: 7000 },
 };
 

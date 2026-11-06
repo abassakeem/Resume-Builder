@@ -39,6 +39,13 @@ const SECTIONS = [
   { id: "projects", label: "Projects", icon: Code2, description: "Side projects or notable work that shows what you can build.", count: d => d.projects?.length },
 ];
 
+const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
+
+const describeImport = d => {
+  const skills = d.skills.reduce((n, s) => n + s.keywords.length, 0);
+  return `Found ${plural(d.work.length, "job")}, ${plural(d.education.length, "school")}, ${plural(skills, "skill")} and ${plural(d.projects.length, "project")}.`;
+};
+
 const toolbarButton =
   "flex items-center gap-2 h-9 px-3 rounded-lg border border-neutral-700 bg-neutral-800/50 text-sm text-neutral-300 hover:bg-neutral-800 hover:text-white transition";
 
@@ -71,22 +78,34 @@ export default function App() {
     scrollRef.current?.scrollTo({ top: 0 });
   };
 
-  const handleImport = e => {
+  const handleImport = async e => {
     const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-      try {
-        const parsed = JSON.parse(ev.target.result);
-        if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error();
-        setData(parsed);
-        notify("success", "Resume imported", `Loaded your data from ${file.name}.`);
-      } catch {
-        notify("error", "Couldn't import that file", `${file.name} isn't valid resume JSON. Use a file saved with Export.`);
-      }
-    };
-    reader.readAsText(file);
     e.target.value = "";
+    if (!file) return;
+    const previous = data;
+    const undo = { label: "Undo", onClick: () => setData(previous) };
+
+    try {
+      if (file.type === "application/pdf" || /\.pdf$/i.test(file.name)) {
+        const { importResumePdf } = await import("./lib/importResumePdf");
+        const result = await importResumePdf(await file.arrayBuffer());
+        if (result.kind === "embedded") {
+          setData(result.data);
+          notify("success", "Resume imported", `Restored everything from ${file.name}.`, undo);
+        } else {
+          setData(d => ({ ...d, ...result.data }));
+          notify("warning", "Imported from PDF text", `${describeImport(result.data)} Some details may be in the wrong field, so check each section.`, undo);
+        }
+        return;
+      }
+
+      const parsed = JSON.parse(await file.text());
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error();
+      setData(parsed);
+      notify("success", "Resume imported", `Loaded your data from ${file.name}.`, undo);
+    } catch (err) {
+      notify("error", "Couldn't import that file", err?.userMessage ?? `${file.name} isn't a resume PDF or a JSON file saved with Export.`);
+    }
   };
 
   const handleExport = () => {
@@ -147,8 +166,8 @@ export default function App() {
         </div>
         <div className="flex-1" />
 
-        <input ref={fileRef} type="file" accept=".json" className="hidden" onChange={handleImport} />
-        <button type="button" onClick={() => fileRef.current.click()} className={toolbarButton} title="Import resume data from a JSON file">
+        <input ref={fileRef} type="file" accept=".pdf,.json,application/pdf,application/json" className="hidden" onChange={handleImport} />
+        <button type="button" onClick={() => fileRef.current.click()} className={toolbarButton} title="Import a resume PDF or a JSON file saved with Export">
           <Upload size={15} /> <span className="hidden md:inline">Import</span>
         </button>
         <button type="button" onClick={handleExport} className={toolbarButton} title="Save resume data as a JSON file">
