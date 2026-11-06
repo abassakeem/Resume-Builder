@@ -115,7 +115,7 @@ export default function ClassicTemplate({ data }) {
                     {ed.studyType} {ed.area}{ed.gpa ? ` — GPA: ${ed.gpa}` : ""}
                   </Text>
                   <Text style={styles.entryMeta}>
-                    {ed.startDate} - {ed.endDate}
+                    {[ed.startDate, ed.endDate].filter(Boolean).join(" - ")}
                   </Text>
                 </View>
               </View>
@@ -136,7 +136,7 @@ export default function ClassicTemplate({ data }) {
                 <View style={styles.entryRow}>
                   <Text style={styles.entrySubtitle}>{job.position}</Text>
                   <Text style={styles.entryMeta}>
-                    {job.startDate} - {job.endDate}
+                    {[job.startDate, job.endDate].filter(Boolean).join(" - ")}
                   </Text>
                 </View>
                 {job.highlights?.map((h, j) => (
@@ -156,7 +156,7 @@ export default function ClassicTemplate({ data }) {
             <Text style={styles.sectionTitle}>{headings?.skills || "Technical Strengths"}</Text>
             {skills.map((s, i) => (
               <View key={i} style={styles.skillRow}>
-                <Text style={styles.skillLabel}>{s.name}:</Text>
+                <Text style={styles.skillLabel}>{s.name ? `${s.name}:` : ""}</Text>
                 <Text style={styles.skillValue}>{s.keywords?.join(", ")}</Text>
               </View>
             ))}

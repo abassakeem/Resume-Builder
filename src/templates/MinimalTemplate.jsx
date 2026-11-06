@@ -130,7 +130,7 @@ export default function MinimalTemplate({ data }) {
               <View key={i} style={{ marginBottom: 6 }}>
                 <View style={styles.entryRow}>
                   <Text style={styles.entryTitle}>{ed.institution}</Text>
-                  <Text style={styles.entryMeta}>{ed.startDate} – {ed.endDate}</Text>
+                  <Text style={styles.entryMeta}>{[ed.startDate, ed.endDate].filter(Boolean).join(" – ")}</Text>
                 </View>
                 <Text style={styles.entryPosition}>
                   {ed.studyType} in {ed.area}{ed.gpa ? `  ·  GPA ${ed.gpa}` : ""}
@@ -149,7 +149,7 @@ export default function MinimalTemplate({ data }) {
               <View key={i} style={{ marginBottom: 8 }}>
                 <View style={styles.entryRow}>
                   <Text style={styles.entryTitle}>{job.company}</Text>
-                  <Text style={styles.entryMeta}>{job.startDate} – {job.endDate}</Text>
+                  <Text style={styles.entryMeta}>{[job.startDate, job.endDate].filter(Boolean).join(" – ")}</Text>
                 </View>
                 <Text style={styles.entryPosition}>{job.position}  ·  {job.location}</Text>
                 {job.highlights?.map((h, j) => (

@@ -158,7 +158,7 @@ export default function ModernTemplate({ data }) {
                     {ed.studyType} {ed.area}
                   </Text>
                   <Text style={styles.sideSkillKeywords}>
-                    {ed.startDate} – {ed.endDate}
+                    {[ed.startDate, ed.endDate].filter(Boolean).join(" – ")}
                   </Text>
                   {ed.gpa && <Text style={styles.sideSkillKeywords}>GPA: {ed.gpa}</Text>}
                 </View>
@@ -180,7 +180,7 @@ export default function ModernTemplate({ data }) {
                   </View>
                   <View style={styles.entryRow}>
                     <Text style={styles.entrySubtitle}>{job.position}</Text>
-                    <Text style={styles.entryMeta}>{job.startDate} – {job.endDate}</Text>
+                    <Text style={styles.entryMeta}>{[job.startDate, job.endDate].filter(Boolean).join(" – ")}</Text>
                   </View>
                   {job.highlights?.map((h, j) => (
                     <View key={j} style={styles.bullet}>
