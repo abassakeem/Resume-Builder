@@ -1,10 +1,10 @@
 import React from "react";
 import { Field, TagInput, ItemCard, AddButton } from "./ui";
-import { useExpanded } from "./formUtils";
+import { useExpanded, moveItem, moveProps } from "./formUtils";
 
 const empty = () => ({ name: "", url: "", keywords: [], description: "" });
 
-export default function ProjectsForm({ data, onChange }) {
+export default function ProjectsForm({ data, onChange, reorderable = true }) {
   const items = data.projects || [];
   const expanded = useExpanded();
 
@@ -23,6 +23,12 @@ export default function ProjectsForm({ data, onChange }) {
     expanded.removed(i);
   };
 
+  // The PDF prints entries in this order, so let the user arrange them.
+  const move = (i, delta) => {
+    onChange({ ...data, projects: moveItem(items, i, delta) });
+    expanded.moved(i, i + delta);
+  };
+
   return (
     <div className="space-y-3">
       {items.map((p, i) => (
@@ -33,6 +39,7 @@ export default function ProjectsForm({ data, onChange }) {
           open={expanded.isOpen(i)}
           onToggle={() => expanded.toggle(i)}
           onRemove={() => remove(i)}
+          {...(reorderable ? moveProps(items, i, move) : {})}
           removeLabel="Remove project"
         >
           <div className="space-y-4">

@@ -1,13 +1,13 @@
 import React from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { Field, ItemCard, AddButton } from "./ui";
-import { useExpanded, joinParts, dateRange } from "./formUtils";
+import { useExpanded, moveItem, moveProps, joinParts, dateRange } from "./formUtils";
 
 const empty = () => ({
   company: "", position: "", location: "", startDate: "", endDate: "", highlights: [""]
 });
 
-export default function WorkForm({ data, onChange }) {
+export default function WorkForm({ data, onChange, reorderable = true }) {
   const items = data.work || [];
   const expanded = useExpanded();
 
@@ -35,6 +35,12 @@ export default function WorkForm({ data, onChange }) {
     expanded.removed(i);
   };
 
+  // The PDF prints entries in this order, so let the user arrange them.
+  const move = (i, delta) => {
+    onChange({ ...data, work: moveItem(items, i, delta) });
+    expanded.moved(i, i + delta);
+  };
+
   return (
     <div className="space-y-3">
       {items.map((job, i) => (
@@ -45,6 +51,7 @@ export default function WorkForm({ data, onChange }) {
           open={expanded.isOpen(i)}
           onToggle={() => expanded.toggle(i)}
           onRemove={() => remove(i)}
+          {...(reorderable ? moveProps(items, i, move) : {})}
           removeLabel="Remove role"
         >
           <div className="grid grid-cols-1 @sm:grid-cols-2 gap-4">

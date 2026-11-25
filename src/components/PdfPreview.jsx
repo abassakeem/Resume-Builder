@@ -5,12 +5,21 @@ import { embedResumeData } from "../lib/embeddedData";
 import ClassicTemplate from "../templates/ClassicTemplate";
 import ModernTemplate from "../templates/ModernTemplate";
 import MinimalTemplate from "../templates/MinimalTemplate";
+import ClassicCvTemplate from "../templates/academic/ClassicCvTemplate";
+import ModernCvTemplate from "../templates/academic/ModernCvTemplate";
+import { isCvData } from "../lib/cv/model";
+import { prepareCv } from "../lib/cv/sections";
 import { Download } from "lucide-react";
 
 const TEMPLATES = {
   1: ClassicTemplate,
   2: ModernTemplate,
   3: MinimalTemplate,
+};
+
+const CV_TEMPLATES = {
+  "cv-classic": ClassicCvTemplate,
+  "cv-modern": ModernCvTemplate,
 };
 
 const MAX_PAGE_WIDTH = 820;
@@ -37,13 +46,18 @@ const forPdf = data => ({
 });
 
 const buildPdf = data => {
+  if (isCvData(data)) {
+    const CvTemplate = CV_TEMPLATES[data.selectedTemplate] || ClassicCvTemplate;
+    return pdf(<CvTemplate data={prepareCv(data)} />).toBlob();
+  }
   const Template = getTemplate(data);
   return pdf(<Template data={forPdf(data)} />).toBlob();
 };
 
 export function DownloadButton({ data }) {
   const [building, setBuilding] = useState(false);
-  const filename = `${(data.basics?.name || "resume").replace(/\s+/g, "_")}_Resume.pdf`;
+  const isCv = isCvData(data);
+  const filename = `${(data.basics?.name || (isCv ? "cv" : "resume")).replace(/\s+/g, "_")}_${isCv ? "CV" : "Resume"}.pdf`;
 
   const handleDownload = async () => {
     setBuilding(true);
@@ -76,9 +90,12 @@ export function DownloadButton({ data }) {
 
 // Renders the PDF to canvases off-screen and swaps them in only once every page is drawn,
 // so the preview updates in place instead of reloading (and flashing) like an iframe viewer.
-export default function PdfPreview({ data }) {
+// `onPages` (optional) is told the page count after each render.
+export default function PdfPreview({ data, onPages }) {
   const scrollRef = useRef();
   const pagesRef = useRef();
+  const onPagesRef = useRef(onPages);
+  onPagesRef.current = onPages;
   const [width, setWidth] = useState(0);
   const [ready, setReady] = useState(false);
 
@@ -116,6 +133,7 @@ export default function PdfPreview({ data }) {
         }
         pagesRef.current.replaceChildren(...canvases);
         setReady(true);
+        onPagesRef.current?.(doc.numPages);
       } finally {
         doc.destroy();
       }
