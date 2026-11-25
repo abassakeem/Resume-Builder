@@ -1,0 +1,65 @@
+import { StyleSheet } from "@react-pdf/renderer";
+
+// Builds the PDF styles for an academic CV template from its theme.
+export function makeStyles(t) {
+  return StyleSheet.create({
+    page: {
+      fontFamily: t.fonts.regular,
+      fontSize: t.size,
+      lineHeight: 1.35,
+      color: t.text,
+      backgroundColor: "#ffffff",
+      paddingTop: 50,
+      paddingBottom: 56,
+      paddingHorizontal: 54,
+    },
+    name: {
+      fontFamily: t.fonts.bold,
+      fontSize: t.nameSize,
+      textAlign: t.align,
+      color: t.heading,
+      letterSpacing: t.nameLetterSpacing,
+      lineHeight: 1.15,
+      marginBottom: 6,
+    },
+    contact: { fontSize: t.size - 0.5, textAlign: t.align, color: t.muted, marginBottom: 1.5 },
+    link: { color: t.link, textDecoration: "none" },
+    sectionTitle: {
+      fontFamily: t.fonts.bold,
+      fontSize: t.size + 0.5,
+      color: t.heading,
+      textTransform: "uppercase",
+      letterSpacing: 1,
+      marginTop: 14,
+      marginBottom: 5,
+      paddingBottom: 2,
+      borderBottomWidth: t.ruleWidth,
+      borderBottomColor: t.rule,
+    },
+    groupTitle: { fontFamily: t.fonts.italic, fontSize: t.size, color: t.heading, marginTop: 5, marginBottom: 2 },
+    entry: { marginBottom: 6 },
+    row: { flexDirection: "row", justifyContent: "space-between" },
+    rowMain: { flex: 1, paddingRight: 10 },
+    rowSide: { flexShrink: 0, maxWidth: 150, textAlign: "right", color: t.muted },
+    bold: { fontFamily: t.fonts.bold },
+    italic: { fontFamily: t.fonts.italic },
+    muted: { color: t.muted },
+    bullet: { flexDirection: "row", marginTop: 1.5, paddingLeft: 8 },
+    bulletDot: { width: 9 },
+    bulletText: { flex: 1 },
+    numbered: { flexDirection: "row", marginBottom: 4 },
+    number: { width: 24, color: t.muted },
+    numberedText: { flex: 1 },
+    plain: { marginBottom: 3 },
+    // Positioned from the top (see footerTop in CvDocument): react-pdf drops a fixed,
+    // bottom-anchored Text with a render prop when a line height is inherited from the page.
+    footer: {
+      position: "absolute",
+      left: 54,
+      right: 54,
+      fontSize: 8,
+      color: t.muted,
+      textAlign: t.align === "center" ? "center" : "right",
+    },
+  });
+}

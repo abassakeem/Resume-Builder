@@ -2,10 +2,11 @@ import React from "react";
 import { Check } from "lucide-react";
 import { templates } from "./templateCatalog";
 
-export default function TemplatePicker({ selected, onSelect }) {
+// `options` defaults to the resume templates; the Academic CV passes its own list.
+export default function TemplatePicker({ selected, onSelect, options = templates }) {
   return (
     <div className="space-y-3">
-      {templates.map(t => {
+      {options.map(t => {
         const active = selected === t.id;
         return (
           <button
